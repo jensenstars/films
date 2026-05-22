@@ -80,7 +80,6 @@
 
     <header>
         <h1>Essential Chinese Cinema</h1>
-        <!-- UPDATED SUBTITLE -->
         <p class="subtitle">A selection of cinematic masterpieces curated by Jensen for family movie nights. ✌️</p>
     </header>
 
@@ -102,7 +101,6 @@
     </footer>
 
     <script>
-        // Helper function to render a region's movies
         function renderRegion(regionName, moviesList, container) {
             const section = document.createElement('section');
             section.innerHTML = `<h2>${regionName}</h2><div class="movie-grid"></div>`;
@@ -140,7 +138,6 @@
             const response = await fetch('data/movies.json');
             const movies = await response.json();
             
-            // Group all movies by their region
             const groups = movies.reduce((acc, m) => {
                 acc[m.region] = acc[m.region] || [];
                 acc[m.region].push(m);
@@ -149,7 +146,6 @@
 
             const main = document.getElementById('content-library');
             
-            // Define Chinese regions to print first
             const chineseRegions = ["Mainland China", "Hong Kong", "Taiwan"];
 
             // 1. Render Chinese regions first
@@ -159,14 +155,14 @@
                 }
             });
 
-            // 2. Identify and filter non-Chinese regions
             const otherRegions = Object.keys(groups).filter(r => !chineseRegions.includes(r));
 
-            // 3. If other regions exist, print separator then render them
+            // 3. Render non-Chinese regions separated by the updated header
             if (otherRegions.length > 0) {
                 const separator = document.createElement('div');
                 separator.className = 'group-separator';
-                separator.innerHTML = `<h3 class="separator-text">These films below are not Chinese but Jensen also loves them</h3>`;
+                // UPDATED COPY WITH PERIOD AND EMOJI
+                separator.innerHTML = `<h3 class="separator-text">These films below are not Chinese but Jensen also loves them. 😁</h3>`;
                 main.appendChild(separator);
 
                 otherRegions.forEach(region => {
