@@ -46,11 +46,11 @@
         /* Minimalist Description Container */
         .movie-desc { font-size: 0.95rem; color: var(--text-muted); flex-grow: 1; margin-bottom: 1.5rem; }
         
-        /* Modified: Original Title set to regular (not bold) font weight */
+        /* Original Title set to regular font weight */
         .cn-title { color: #fff; font-weight: normal; }
         
         /* Trailer link styling */
-        .trailer-link { color: var(--accent-color); text-decoration: none; transition: 0.2s; }
+        .trailer-link { color: var(--accent-color); text-decoration: none; transition: 0.2s; font-weight: 500; }
         .trailer-link:hover { text-decoration: underline; color: #fff; }
 
         .watch-btn {
@@ -119,7 +119,8 @@
                         <!-- Restructured Description container: Just Title + Trailer Link -->
                         <p class="movie-desc">
                             <span class="cn-title">${m.original_title}</span>
-                            ${m.trailer_link ? ` &nbsp;•&nbsp; <a href="${m.trailer_link}" target="_blank" class="trailer-link">Trailer ↗</a>` : ''}
+                            <!-- UPDATED TO "Official Trailer →" -->
+                            ${m.trailer_link ? ` &nbsp;•&nbsp; <a href="${m.trailer_link}" target="_blank" class="trailer-link">Official Trailer →</a>` : ''}
                         </p>
                         
                         <a href="${m.watch_link}" target="_blank" class="watch-btn">Watch Now</a>
