@@ -11,6 +11,28 @@
     "watch_link": "https://watchseries.bar/search/farewell-my-concubine"
   },
   {
+    "title": "To Live",
+    "original_title": "活着",
+    "year": "1994",
+    "director": "Zhang Yimou",
+    "region": "Mainland China",
+    "rating": 7.9,
+    "poster": "https://image.tmdb.org/t/p/w500/bv0qREWTw8TPAtgt22ELp1UlKVl.jpg",
+    "desc": "A family struggle to survive through a tumultuous period of Chinese history, from the 1940s through the 1970s.",
+    "watch_link": "https://watchseries.bar/search/to-live"
+  },
+  {
+    "title": "Let the Bullets Fly",
+    "original_title": "让子弹飞",
+    "year": "2010",
+    "director": "Jiang Wen",
+    "region": "Mainland China",
+    "rating": 7.8,
+    "poster": "https://image.tmdb.org/t/p/w500/pkwBO3XkQLhgb31vl5ZwmGC5meT.jpg",
+    "desc": "A bandit posing as a mayor enters a provincial town, sparking a battle of wits with a local mob boss.",
+    "watch_link": "https://watchseries.bar/search/let-the-bullets-fly"
+  },
+  {
     "title": "In the Mood for Love",
     "original_title": "花样年华",
     "year": "2000",
@@ -22,6 +44,61 @@
     "watch_link": "https://watchseries.bar/search/in-the-mood-for-love"
   },
   {
+    "title": "Chungking Express",
+    "original_title": "重庆森林",
+    "year": "1994",
+    "director": "Wong Kar-wai",
+    "region": "Hong Kong",
+    "rating": 8.0,
+    "poster": "https://image.tmdb.org/t/p/w500/su10ww5eTaGV5Honll9AEPTblxW.jpg",
+    "desc": "Two melancholy Hong Kong policemen fall in love: one with a mysterious underworld figure, the other with a server at a late-night restaurant.",
+    "watch_link": "https://watchseries.bar/search/chungking-express"
+  },
+  {
+    "title": "Happy Together",
+    "original_title": "春光乍泄",
+    "year": "1997",
+    "director": "Wong Kar-wai",
+    "region": "Hong Kong",
+    "rating": 7.9,
+    "poster": "https://image.tmdb.org/t/p/w500/muBbJv9dQ3M4wQI9ZeGy5xQQ2dG.jpg",
+    "desc": "A turbulent, passionate relationship between two men from Hong Kong unfolds against the backdrop of Buenos Aires.",
+    "watch_link": "https://watchseries.bar/search/happy-together"
+  },
+  {
+    "title": "Kung Fu Hustle",
+    "original_title": "功夫",
+    "year": "2004",
+    "director": "Stephen Chow",
+    "region": "Hong Kong",
+    "rating": 7.4,
+    "poster": "https://image.tmdb.org/t/p/w500/2eCco43L9wp56vl7Ock5Qijj1dx.jpg",
+    "desc": "In 1940s Shanghai, a wannabe gangster seeks to join the notorious Axe Gang, sparking a war in a hidden kung fu slum.",
+    "watch_link": "https://watchseries.bar/search/kung-fu-hustle"
+  },
+  {
+    "title": "Shaolin Soccer",
+    "original_title": "少林足球",
+    "year": "2001",
+    "director": "Stephen Chow",
+    "region": "Hong Kong",
+    "rating": 6.9,
+    "poster": "https://image.tmdb.org/t/p/w500/7p4P39tq7uI9HAtH0G4P2r7lZ5B.jpg",
+    "desc": "A former Shaolin monk reunites his brothers to apply their superhuman martial arts skills to play soccer.",
+    "watch_link": "https://watchseries.bar/search/shaolin-soccer"
+  },
+  {
+    "title": "Infernal Affairs",
+    "original_title": "无间道",
+    "year": "2002",
+    "director": "Andrew Lau & Alan Mak",
+    "region": "Hong Kong",
+    "rating": 8.0,
+    "poster": "https://image.tmdb.org/t/p/w500/qdlwFWn2YdLzw5KHpMpzRY9BI7r.jpg",
+    "desc": "A game of cat-and-mouse between an undercover cop in a triad and a triad mole in the police force.",
+    "watch_link": "https://watchseries.bar/search/infernal-affairs"
+  },
+  {
     "title": "Eat Drink Man Woman",
     "original_title": "饮食男女",
     "year": "1994",
@@ -29,7 +106,29 @@
     "region": "Taiwan",
     "rating": 7.8,
     "poster": "https://image.tmdb.org/t/p/w500/j55sl9hODGyht190ghbTDcjoA9a.jpg",
-    "desc": "A semi-retired master chef in Taipei communicates with his three adult daughters primarily through elaborate Sunday dinners.",
+    "desc": "A master chef in Taipei communicates with his three adult daughters through elaborate Sunday dinners.",
     "watch_link": "https://watchseries.bar/search/eat-drink-man-woman"
+  },
+  {
+    "title": "Crouching Tiger, Hidden Dragon",
+    "original_title": "卧虎藏龙",
+    "year": "2000",
+    "director": "Ang Lee",
+    "region": "Taiwan",
+    "rating": 7.4,
+    "poster": "https://image.tmdb.org/t/p/w500/tKqJ6yWtOnTbiA2uzac2gejDqpI.jpg",
+    "desc": "A young warrior steals a legendary sword, sparking a high-stakes pursuit across breathtaking landscapes.",
+    "watch_link": "https://watchseries.bar/search/crouching-tiger-hidden-dragon"
+  },
+  {
+    "title": "Yi Yi",
+    "original_title": "一一",
+    "year": "2000",
+    "director": "Edward Yang",
+    "region": "Taiwan",
+    "rating": 8.1,
+    "poster": "https://image.tmdb.org/t/p/w500/7f9JIomiQYGUG8Fd56F7sPwYlZ8.jpg",
+    "desc": "An intimate, multi-generational portrait of a middle-class family in modern Taipei.",
+    "watch_link": "https://watchseries.bar/search/yi-yi"
   }
 ]
