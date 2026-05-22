@@ -310,5 +310,18 @@
     "poster": "https://image.tmdb.org/t/p/w500/euZyZb6iGreujYKrGyZHRddhUYh.jpg",
     "desc": "The Fantastic Mr. Fox, bored with his current life, plans a heist against the three local farmers. The farmers, tired of sharing their chickens with the sly fox, seek revenge against him and his family.",
     "watch_link": "https://watchseries.bar/search/fantastic-mr-fox"
+  },
+  {
+    "title": "Project Hail Mary",
+    "original_title": "Project Hail Mary",
+    "year": "2026",
+    "director": "Phil Lord",
+    "region": "USA",
+    "rating": 8.6,
+    "imdb_rating": "8.4",
+    "lb_rating": "4.32",
+    "poster": "https://image.tmdb.org/t/p/w500/yihdXomYb5kTeSivtFndMy5iDmf.jpg",
+    "desc": "Science teacher Ryland Grace wakes up on a spaceship light years from home with no recollection of who he is or how he got there. As his memory returns, he begins to uncover his mission: solve the riddle of the mysterious substance causing the sun to die out. He must call on his scientific knowledge and unorthodox ideas to save everything on Earth from extinction.",
+    "watch_link": "https://watchseries.bar/search/project-hail-mary"
   }
 ]
