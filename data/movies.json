@@ -414,5 +414,18 @@
     "poster": "https://image.tmdb.org/t/p/w500/1QdXdRYfktUSONkl1oD5gc6Be0s.jpg",
     "desc": "Hundreds of cash-strapped players accept a strange invitation to compete in children's games. Inside, a tempting prize awaits \u2014 with deadly high stakes.",
     "watch_link": "https://watchseries.bar/search/squid-game"
+  },
+  {
+    "title": "The Tourist",
+    "original_title": "The Tourist",
+    "year": "2022",
+    "director": "Jack Williams (Show Creator)",
+    "region": "United Kingdom",
+    "rating": 6.8,
+    "imdb_rating": "7.1",
+    "lb_rating": "3.41",
+    "poster": "https://image.tmdb.org/t/p/w500/3jLF76FYBh5YHb4n1mQz1ayjDD4.jpg",
+    "desc": "When a man wakes up in the Australian outback with no memory, he must use the few clues he has to discover his identity before his past catches up with him.",
+    "watch_link": "https://watchseries.bar/search/the-tourist"
   }
 ]
