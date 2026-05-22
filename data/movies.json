@@ -206,5 +206,18 @@
     "poster": "https://image.tmdb.org/t/p/w500/mR8dSQZI8X6Z1NClJhFrtJp636z.jpg",
     "desc": "A Taipei family faces personal and moral uncertainty as everyday events test their relationships and sense of purpose.",
     "watch_link": "https://watchseries.bar/search/yi-yi"
+  },
+  {
+    "title": "Moon",
+    "original_title": "Moon",
+    "year": "2009",
+    "director": "Duncan Jones",
+    "region": "United Kingdom",
+    "rating": 7.6,
+    "imdb_rating": "7.8",
+    "lb_rating": "3.83",
+    "poster": "https://image.tmdb.org/t/p/w500/35IU0Mq0zFsN1mYwDGts5mKc77n.jpg",
+    "desc": "With only three weeks left in his three-year contract, Sam Bell is eager to return to Earth. Stationed alone at a Moon-based facility with his computer assistant GERTY, an unexpected accident sets off a series of unsettling events that shake his isolation.",
+    "watch_link": "https://watchseries.bar/search/moon"
   }
 ]
