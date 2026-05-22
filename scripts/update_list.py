@@ -17,32 +17,51 @@ if not API_KEY:
 def slugify(text):
     return re.sub(r'\W+', '-', text.lower()).strip('-')
 
-# --- NEW: Grab IMDb Rating ---
+# --- NEW: Fortified IMDb Scraper ---
 def get_imdb_rating(imdb_id):
     if not imdb_id: return "--"
+    # The "Disguise" so the bot looks like a real Google Chrome browser on Windows
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+    
+    # Plan A: Try the free API with the new disguise
     try:
-        res = requests.get(f"https://search.imdbot.workers.dev/?tt={imdb_id}").json()
-        return str(res['short']['aggregateRating']['ratingValue'])
-    except:
-        return "--"
+        res = requests.get(f"https://search.imdbot.workers.dev/?tt={imdb_id}", headers=headers, timeout=10)
+        data = res.json()
+        return str(data['short']['aggregateRating']['ratingValue'])
+    except Exception as e:
+        print(f"IMDb API failed: {e}. Trying Backup Plan...")
+    
+    # Plan B: Go straight to IMDb.com and read their hidden SEO data
+    try:
+        res = requests.get(f"https://www.imdb.com/title/{imdb_id}/", headers=headers, timeout=10)
+        soup = BeautifulSoup(res.text, 'html.parser')
+        script = soup.find('script', type='application/ld+json')
+        if script:
+            ld_data = json.loads(script.string)
+            return str(ld_data['aggregateRating']['ratingValue'])
+    except Exception as e:
+        print(f"IMDb Backup Scraper failed: {e}")
+        
+    return "--"
 
-# --- NEW: Grab Letterboxd Rating ---
+# --- NEW: Fortified Letterboxd Scraper ---
 def get_letterboxd_rating(imdb_id):
     if not imdb_id: return "--"
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
     try:
         url = f"https://letterboxd.com/imdb/{imdb_id}/"
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        res = requests.get(url, headers=headers)
-        
+        res = requests.get(url, headers=headers, timeout=10)
         soup = BeautifulSoup(res.text, 'html.parser')
+        
         meta_tag = soup.find('meta', attrs={'name': 'twitter:data2'})
         if meta_tag:
             match = re.search(r'([0-9.]+)\sout\sof', meta_tag['content'])
             if match:
                 return str(match.group(1))
-        return "--"
-    except:
-        return "--"
+    except Exception as e:
+        print(f"LB Scraper failed: {e}")
+        
+    return "--"
 
 def fetch_details(query):
     print("Calling TMDB API...")
@@ -58,13 +77,13 @@ def fetch_details(query):
     
     director = next((c['name'] for c in m['credits']['crew'] if c['job'] == 'Director'), "Unknown")
     country = m['production_countries'][0]['iso_3166_1'] if m.get('production_countries') else "Other"
-    regions = {"CN": "Mainland China", "HK": "Hong Kong", "TW": "Taiwan", "FR": "France", "US": "USA", "JP": "Japan", "KR": "South Korea"}
+    regions = {"CN": "Mainland China", "HK": "Hong Kong", "TW": "Taiwan", "FR": "France", "US": "USA", "JP": "Japan", "KR": "South Korea", "GB": "United Kingdom"}
     
-    # 1. Grab TMDB's IMDb ID reference
+    # Grab TMDB's IMDb ID reference
     imdb_id = m.get('imdb_id')
     print(f"Found IMDb ID: {imdb_id}. Fetching secondary ratings...")
 
-    # 2. Fetch the extra ratings
+    # Fetch the extra ratings
     imdb_score = get_imdb_rating(imdb_id)
     lb_score = get_letterboxd_rating(imdb_id)
     
