@@ -8,7 +8,7 @@ jobs:
   update-list:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # This gives the bot permission to save the file
+      contents: write 
       
     steps:
       - name: Checkout Repository
@@ -20,7 +20,8 @@ jobs:
           python-version: '3.x'
           
       - name: Install Dependencies
-        run: pip install requests
+        # Added beautifulsoup4 to allow scraping letterboxd
+        run: pip install requests beautifulsoup4
         
       - name: Run Update Script
         env:
@@ -34,6 +35,4 @@ jobs:
           git config --global user.email "bot@github.com"
           git add data/movies.json
           
-          # This line checks if there are actual changes before committing.
-          # If no changes are detected (e.g., movie not found), it skips the commit gracefully.
           git diff --quiet && git diff --staged --quiet || (git commit -m "Automated: Add movie from issue #${{ github.event.issue.number }}" && git push)
