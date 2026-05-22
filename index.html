@@ -24,15 +24,21 @@
         section { margin-bottom: 4rem; }
         h2 { font-size: 2rem; border-bottom: 2px solid var(--accent-color); padding-bottom: 0.5rem; margin-bottom: 2rem; display: inline-block; }
 
-        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2.5rem; }
+        /* Grid updated: Increased card minimum width from 280px to 330px */
+        .movie-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr)); 
+            gap: 2.5rem; 
+        }
+        
         .movie-card { background-color: var(--surface-color); border-radius: 12px; padding: 1.5rem; transition: 0.3s; border: 1px solid #2a2a30; display: flex; flex-direction: column; }
         .movie-card:hover { transform: translateY(-5px); border-color: var(--accent-color); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6); }
 
-        /* Modified Poster Ratio: 135% */
         .movie-poster { position: relative; width: 100%; padding-top: 135%; border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem; background-color: #111; }
         .movie-poster img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
 
-        .movie-title { font-size: 1.4rem; font-weight: bold; margin: 0; color: #ffffff; }
+        /* Title updated: Adjusted size to 1.3rem to prevent wrapping on long names */
+        .movie-title { font-size: 1.3rem; font-weight: bold; margin: 0; color: #ffffff; line-height: 1.3; }
         .movie-meta { font-size: 0.9rem; color: var(--accent-color); margin-bottom: 0.5rem; }
 
         /* Ratings Row */
@@ -57,7 +63,7 @@
 
     <header>
         <h1>Essential Chinese Cinema</h1>
-        <p class="subtitle">A curated selection of cinematic masterpieces by Jensen for family movie nights.</p>
+        <p class="subtitle">A curated selection of cinematic masterpieces for family movie nights.</p>
     </header>
 
     <main id="content-library">
@@ -67,7 +73,6 @@
     <footer>
         <p>A cinematic guide created for family movie nights.</p>
         
-        <!-- Ratings Explanation -->
         <p style="font-size: 0.85rem; color: #666; margin-top: 1rem; line-height: 1.8;">
             * Ratings are dynamically sourced: <br>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="#01b4e4" style="vertical-align: middle; margin-right: 3px; transform: translateY(-1px);"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"/></svg> <strong>TMDB</strong> (The Movie Database /10) &nbsp;|&nbsp; 
@@ -83,7 +88,6 @@
             const response = await fetch('data/movies.json');
             const movies = await response.json();
             
-            // Group by region
             const groups = movies.reduce((acc, m) => {
                 acc[m.region] = acc[m.region] || [];
                 acc[m.region].push(m);
@@ -104,7 +108,6 @@
                             <h3 class="movie-title">${m.title}</h3>
                             <div class="movie-meta">${m.year} • Director: ${m.director}</div>
                             
-                            <!-- Updated Ratings Row is injected right here! -->
                             <div class="ratings-row">
                                 <div class="rating-pill tmdb-score" title="TMDB Rating">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"/></svg>
