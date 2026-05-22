@@ -62,8 +62,26 @@ def fetch_details(query):
     m = requests.get(f"https://api.themoviedb.org/3/movie/{m_id}?api_key={API_KEY}&append_to_response=credits").json()
     
     director = next((c['name'] for c in m['credits']['crew'] if c['job'] == 'Director'), "Unknown")
-    country = m['production_countries'][0]['iso_3166_1'] if m.get('production_countries') else "Other"
-    regions = {"CN": "Mainland China", "HK": "Hong Kong", "TW": "Taiwan", "FR": "France", "US": "USA", "JP": "Japan", "KR": "South Korea", "GB": "United Kingdom"}
+    
+    # --- SMART REGION EXTRACTOR ---
+    if m.get('production_countries'):
+        country_code = m['production_countries'][0]['iso_3166_1'] # "US", "AR", etc.
+        country_name = m['production_countries'][0]['name']       # "United States of America", "Argentina", etc.
+    else:
+        country_code = "Other"
+        country_name = "Other"
+
+    # Custom overrides for your preferred specific names
+    overrides = {
+        "CN": "Mainland China",
+        "US": "USA",
+        "United States of America": "USA",
+        "GB": "United Kingdom"
+    }
+    
+    # Try code override first, then name override, then fall back to TMDB's full English name!
+    region = overrides.get(country_code, overrides.get(country_name, country_name))
+    print(f"Region parsed: code={country_code}, raw_name={country_name} -> display_as={region}")
     
     imdb_id = m.get('imdb_id')
     print(f"Found IMDb ID: {imdb_id}. Fetching secondary ratings...")
@@ -76,7 +94,7 @@ def fetch_details(query):
         "original_title": m.get('original_title', m['title']),
         "year": m.get('release_date', 'Unknown')[:4],
         "director": director,
-        "region": regions.get(country, country),
+        "region": region, # Using our smart parsed region
         "rating": round(m.get('vote_average', 0), 1),
         "imdb_rating": imdb_score,
         "lb_rating": lb_score,
@@ -157,3 +175,4 @@ else:
             f.truncate()
     else:
         print("Script finished without finding a movie.")
+        
