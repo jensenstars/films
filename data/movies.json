@@ -245,5 +245,18 @@
     "poster": "https://image.tmdb.org/t/p/w500/f3OXph1b1QZ9IUvLrd9yjgRqBPW.jpg",
     "desc": "On Manhattan's gilded Upper East Side, a young gay painter is torn between an obsession with his infamous best friend and a promising new romance with an older foreign pianist.",
     "watch_link": "https://watchseries.bar/search/those-people"
+  },
+  {
+    "title": "Little Miss Sunshine",
+    "original_title": "Little Miss Sunshine",
+    "year": "2006",
+    "director": "Jonathan Dayton",
+    "region": "USA",
+    "rating": 7.7,
+    "imdb_rating": "7.8",
+    "lb_rating": "4.21",
+    "poster": "https://image.tmdb.org/t/p/w500/niNdhTpPHSgw22tK0PLjQMV640v.jpg",
+    "desc": "A family loaded with quirky, colorful characters piles into an old van and road trips to California for little Olive to compete in a beauty pageant.",
+    "watch_link": "https://watchseries.bar/search/little-miss-sunshine"
   }
 ]
