@@ -6,45 +6,42 @@ import sys
 from bs4 import BeautifulSoup
 
 API_KEY = os.getenv('TMDB_API_KEY')
+OMDB_API_KEY = os.getenv('OMDB_API_KEY') # Added this variable
 ISSUE_TITLE = os.getenv('ISSUE_TITLE')
 
 print(f"Bot started. Searching for: '{ISSUE_TITLE}'")
 
 if not API_KEY:
-    print("ERROR: TMDB_API_KEY is missing! Check your GitHub Secrets.")
+    print("ERROR: TMDB_API_KEY is missing!")
     sys.exit(1)
+
+if not OMDB_API_KEY:
+    print("WARNING: OMDB_API_KEY is missing! IMDb ratings may fail.")
 
 def slugify(text):
     return re.sub(r'\W+', '-', text.lower()).strip('-')
 
-# --- NEW: Fortified IMDb Scraper ---
+# --- UPDATED: Safe & Official IMDb Rating Fetch ---
 def get_imdb_rating(imdb_id):
     if not imdb_id: return "--"
-    # The "Disguise" so the bot looks like a real Google Chrome browser on Windows
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
+    if not OMDB_API_KEY: return "--"
     
-    # Plan A: Try the free API with the new disguise
     try:
-        res = requests.get(f"https://search.imdbot.workers.dev/?tt={imdb_id}", headers=headers, timeout=10)
-        data = res.json()
-        return str(data['short']['aggregateRating']['ratingValue'])
+        # Querying the official OMDb API directly
+        url = f"https://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={imdb_id}"
+        res = requests.get(url, timeout=10).json()
+        
+        if res.get('Response') == 'True':
+            rating = res.get('imdbRating', '--')
+            return str(rating) if rating != 'N/A' else "--"
+        else:
+            print(f"OMDb Error: {res.get('Error')}")
     except Exception as e:
-        print(f"IMDb API failed: {e}. Trying Backup Plan...")
-    
-    # Plan B: Go straight to IMDb.com and read their hidden SEO data
-    try:
-        res = requests.get(f"https://www.imdb.com/title/{imdb_id}/", headers=headers, timeout=10)
-        soup = BeautifulSoup(res.text, 'html.parser')
-        script = soup.find('script', type='application/ld+json')
-        if script:
-            ld_data = json.loads(script.string)
-            return str(ld_data['aggregateRating']['ratingValue'])
-    except Exception as e:
-        print(f"IMDb Backup Scraper failed: {e}")
+        print(f"OMDb Request failed: {e}")
         
     return "--"
 
-# --- NEW: Fortified Letterboxd Scraper ---
+# --- Letterboxd Scraper ---
 def get_letterboxd_rating(imdb_id):
     if not imdb_id: return "--"
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
@@ -104,7 +101,7 @@ def fetch_details(query):
 movie = fetch_details(ISSUE_TITLE)
 
 if movie:
-    print(f"Success! TMDB: {movie['rating']}, IMDb: {movie['imdb_rating']}, LB: {movie['lb_rating']}")
+    print(f"Success! TMDB: {movie['rating']}, IMDb: {movie['imdb_rating']}, LB: {movie['lb_score'] if 'lb_score' in movie else movie.get('lb_rating', '--')}")
     file_path = 'data/movies.json'
         
     with open(file_path, 'r+') as f:
@@ -120,6 +117,6 @@ if movie:
             f.seek(0)
             json.dump(db, f, indent=2)
             f.truncate()
-            print("Successfully saved new movie with all ratings to data/movies.json!")
+            print("Successfully saved new movie with all official ratings to data/movies.json!")
 else:
     print("Script finished without finding a movie.")
