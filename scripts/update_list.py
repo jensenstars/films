@@ -48,65 +48,93 @@ def get_letterboxd_rating(imdb_id):
         print(f"LB Scraper failed: {e}")
     return "--"
 
-# --- Fetch details helper ---
+# --- Unified Fetch Details (Movies + TV) ---
 def fetch_details(query):
-    print("Calling TMDB API...")
-    search_url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={query}"
+    print("Calling TMDB Multi-Search API...")
+    search_url = f"https://api.themoviedb.org/3/search/multi?api_key={API_KEY}&query={query}"
     search = requests.get(search_url).json()
     
     if not search.get('results'): 
-        print(f"ERROR: No movie found for '{query}'.")
+        print(f"ERROR: No result found for '{query}'.")
         return None
+        
+    # Filter out people/actors and only look for movies or TV shows
+    valid_results = [r for r in search['results'] if r.get('media_type') in ['movie', 'tv']]
+    if not valid_results:
+        print("ERROR: No valid movie or TV series found.")
+        return None
+        
+    first_result = valid_results[0]
+    media_type = first_result['media_type']
+    m_id = first_result['id']
     
-    m_id = search['results'][0]['id']
-    m = requests.get(f"https://api.themoviedb.org/3/movie/{m_id}?api_key={API_KEY}&append_to_response=credits").json()
+    print(f"Found {media_type.upper()} with ID: {m_id}. Fetching details...")
     
-    director = next((c['name'] for c in m['credits']['crew'] if c['job'] == 'Director'), "Unknown")
-    
-    # --- SMART REGION EXTRACTOR ---
-    if m.get('production_countries'):
-        country_code = m['production_countries'][0]['iso_3166_1'] # "US", "AR", etc.
-        country_name = m['production_countries'][0]['name']       # "United States of America", "Argentina", etc.
+    if media_type == 'movie':
+        # Movie Specific Logic
+        m = requests.get(f"https://api.themoviedb.org/3/movie/{m_id}?api_key={API_KEY}&append_to_response=credits").json()
+        title = m['title']
+        original_title = m.get('original_title', title)
+        year = m.get('release_date', 'Unknown')[:4]
+        director = next((c['name'] for c in m['credits']['crew'] if c['job'] == 'Director'), "Unknown")
+        imdb_id = m.get('imdb_id')
+        country = m['production_countries'][0]['iso_3166_1'] if m.get('production_countries') else "Other"
+        country_name = m['production_countries'][0]['name'] if m.get('production_countries') else "Other"
     else:
-        country_code = "Other"
-        country_name = "Other"
+        # TV Specific Logic
+        m = requests.get(f"https://api.themoviedb.org/3/tv/{m_id}?api_key={API_KEY}").json()
+        title = m['name']
+        original_title = m.get('original_name', title)
+        year = m.get('first_air_date', 'Unknown')[:4]
+        
+        # Use Show Creator as the "Director" field
+        creators = m.get('created_by', [])
+        director = f"{creators[0]['name']} (Show Creator)" if creators else "Unknown (TV Series)"
+        
+        # TV IMDb IDs require an extra external ID call in TMDB
+        ext_ids = requests.get(f"https://api.themoviedb.org/3/tv/{m_id}/external_ids?api_key={API_KEY}").json()
+        imdb_id = ext_ids.get('imdb_id')
+        
+        # Parse TV Country
+        if m.get('origin_country'):
+            country = m['origin_country'][0]
+            # Common TV country mapper
+            country_mapper = {"CN": "Mainland China", "HK": "Hong Kong", "TW": "Taiwan", "KR": "South Korea", "JP": "Japan", "US": "United States of America"}
+            country_name = country_mapper.get(country, country)
+        else:
+            country, country_name = "Other", "Other"
 
-    # Custom overrides for your preferred specific names
+    # Custom region overrides (e.g. United States -> USA)
     overrides = {
         "CN": "Mainland China",
         "US": "USA",
         "United States of America": "USA",
         "GB": "United Kingdom"
     }
-    
-    # Try code override first, then name override, then fall back to TMDB's full English name!
-    region = overrides.get(country_code, overrides.get(country_name, country_name))
-    print(f"Region parsed: code={country_code}, raw_name={country_name} -> display_as={region}")
-    
-    imdb_id = m.get('imdb_id')
-    print(f"Found IMDb ID: {imdb_id}. Fetching secondary ratings...")
+    region = overrides.get(country, overrides.get(country_name, country_name))
+    print(f"Region parsed: code={country}, raw_name={country_name} -> display_as={region}")
 
+    # Fetch secondary ratings
     imdb_score = get_imdb_rating(imdb_id)
     lb_score = get_letterboxd_rating(imdb_id)
     
     return {
-        "title": m['title'],
-        "original_title": m.get('original_title', m['title']),
-        "year": m.get('release_date', 'Unknown')[:4],
+        "title": title,
+        "original_title": original_title,
+        "year": year,
         "director": director,
-        "region": region, # Using our smart parsed region
+        "region": region,
         "rating": round(m.get('vote_average', 0), 1),
         "imdb_rating": imdb_score,
         "lb_rating": lb_score,
         "poster": f"https://image.tmdb.org/t/p/w500{m['poster_path']}" if m.get('poster_path') else "",
         "desc": m.get('overview', 'No description available.'),
-        "watch_link": f"https://watchseries.bar/search/{slugify(m['title'])}"
+        "watch_link": f"https://watchseries.bar/search/{slugify(title)}"
     }
 
 # --- MAIN LOGIC FLOW ---
 file_path = 'data/movies.json'
 
-# Detect if this is a REMOVE or DELETE command
 target_title = ISSUE_TITLE.strip()
 is_removal = False
 
@@ -117,19 +145,19 @@ if removal_match:
     print(f"REMOVAL COMMAND DETECTED for movie: '{target_title}'")
 
 if is_removal:
-    # 1. Fetch official TMDB title for deletion to handle typos/variations
     print("Fetching official TMDB title for accurate deletion...")
-    search_url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={target_title}"
+    search_url = f"https://api.themoviedb.org/3/search/multi?api_key={API_KEY}&query={target_title}"
     search = requests.get(search_url).json()
     
-    if search.get('results'):
-        official_title = search['results'][0]['title']
+    valid_results = [r for r in search['results'] if r.get('media_type') in ['movie', 'tv']]
+    if valid_results:
+        first_res = valid_results[0]
+        official_title = first_res['title'] if first_res['media_type'] == 'movie' else first_res['name']
     else:
-        official_title = target_title # Fallback to user text if TMDB offline
+        official_title = target_title
         
     print(f"Target title to remove: '{official_title}'")
 
-    # 2. Modify JSON database
     with open(file_path, 'r+') as f:
         try:
             db = json.load(f)
@@ -137,7 +165,6 @@ if is_removal:
             db = []
             
         original_count = len(db)
-        # Filter out the movie (case-insensitive match)
         db = [m for m in db if m['title'].lower() != official_title.lower()]
         new_count = len(db)
         
@@ -150,7 +177,6 @@ if is_removal:
             print(f"NOTICE: '{official_title}' was not found in your list. No changes made.")
 
 else:
-    # Standard ADD/UPDATE Logic
     movie = fetch_details(target_title)
     if movie:
         print(f"Success! TMDB: {movie['rating']}, IMDb: {movie['imdb_rating']}, LB: {movie['lb_rating']}")
@@ -168,11 +194,10 @@ else:
                 db[existing_index] = movie
             else:
                 db.append(movie)
-                print(f"Successfully added new movie: '{movie['title']}'!")
+                print(f"Successfully added new movie/show: '{movie['title']}'!")
                 
             f.seek(0)
             json.dump(db, f, indent=2)
             f.truncate()
     else:
         print("Script finished without finding a movie.")
-        
