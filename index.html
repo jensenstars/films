@@ -28,7 +28,7 @@
         .movie-card { background-color: var(--surface-color); border-radius: 12px; padding: 1.5rem; transition: 0.3s; border: 1px solid #2a2a30; display: flex; flex-direction: column; }
         .movie-card:hover { transform: translateY(-5px); border-color: var(--accent-color); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6); }
 
-        /* Modified Poster Ratio: 135% is slightly shorter than your original 150% */
+        /* Modified Poster Ratio: 135% */
         .movie-poster { position: relative; width: 100%; padding-top: 135%; border-radius: 8px; overflow: hidden; margin-bottom: 1.5rem; background-color: #111; }
         .movie-poster img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
 
@@ -39,7 +39,6 @@
         .ratings-row { display: flex; gap: 12px; margin-bottom: 1rem; align-items: center; }
         .rating-pill { font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 4px; }
         .tmdb-score { color: var(--tmdb-blue); }
-        .placeholder-score { color: #555; }
 
         .movie-desc { font-size: 0.95rem; color: var(--text-muted); flex-grow: 1; margin-bottom: 1.5rem; }
         .cn-title { color: #fff; font-weight: bold; }
@@ -68,7 +67,7 @@
     <footer>
         <p>A cinematic guide created for family movie nights.</p>
         
-        <!-- New Ratings Explanation -->
+        <!-- Ratings Explanation -->
         <p style="font-size: 0.85rem; color: #666; margin-top: 1rem; line-height: 1.8;">
             * Ratings are dynamically sourced: <br>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="#01b4e4" style="vertical-align: text-bottom; margin-right: 2px;"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"/></svg> <strong>TMDB</strong> (The Movie Database /10) &nbsp;|&nbsp; 
@@ -103,15 +102,22 @@
                         <div class="movie-card">
                             <div class="movie-poster"><img src="${m.poster}" alt="${m.title}"></div>
                             <h3 class="movie-title">${m.title}</h3>
-                            <div class="movie-meta">${m.year} • Director: ${m.director}</div>
+                            <div class="movie-meta">${m.year} • Dir: ${m.director}</div>
+                            
+                            <!-- Updated Ratings Row is injected right here! -->
                             <div class="ratings-row">
-                                <div class="rating-pill tmdb-score">
+                                <div class="rating-pill tmdb-score" title="TMDB Rating">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279-7.416-3.967-7.417 3.967 1.481-8.279-6.064-5.828 8.332-1.151z"/></svg>
                                     ${m.rating}
                                 </div>
-                                <div class="rating-pill placeholder-score">IMDb --</div>
-                                <div class="rating-pill placeholder-score">LB --</div>
+                                <div class="rating-pill" style="color: #f5c518;" title="IMDb Rating">
+                                    <strong>IMDb</strong> ${m.imdb_rating || '--'}
+                                </div>
+                                <div class="rating-pill" style="color: #00e054;" title="Letterboxd Rating">
+                                    <strong>LB</strong> ${m.lb_rating || '--'}
+                                </div>
                             </div>
+                            
                             <p class="movie-desc"><span class="cn-title">${m.original_title}:</span> ${m.desc}</p>
                             <a href="${m.watch_link}" target="_blank" class="watch-btn">Watch Now</a>
                         </div>
@@ -123,5 +129,4 @@
         loadMovies();
     </script>
 </body>
-  
 </html>
