@@ -1,4 +1,5 @@
 name: Add Movie to List
+
 on:
   issues:
     types: [opened]
@@ -7,10 +8,12 @@ jobs:
   update-list:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Allows the bot to commit the updated JSON
-    steps:
-      - uses: actions/checkout@v4
+      contents: write # This gives the bot permission to save the file
       
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -30,5 +33,7 @@ jobs:
           git config --global user.name "Movie-Bot"
           git config --global user.email "bot@github.com"
           git add data/movies.json
-          git commit -m "Automated: Add movie from issue #${{ github.event.issue.number }}"
-          git push
+          
+          # This line checks if there are actual changes before committing.
+          # If no changes are detected (e.g., movie not found), it skips the commit gracefully.
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated: Add movie from issue #${{ github.event.issue.number }}" && git push)
