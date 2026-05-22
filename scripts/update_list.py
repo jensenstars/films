@@ -6,7 +6,7 @@ import sys
 from bs4 import BeautifulSoup
 
 API_KEY = os.getenv('TMDB_API_KEY')
-OMDB_API_KEY = os.getenv('OMDB_API_KEY') # Added this variable
+OMDB_API_KEY = os.getenv('OMDB_API_KEY')
 ISSUE_TITLE = os.getenv('ISSUE_TITLE')
 
 print(f"Bot started. Searching for: '{ISSUE_TITLE}'")
@@ -15,30 +15,21 @@ if not API_KEY:
     print("ERROR: TMDB_API_KEY is missing!")
     sys.exit(1)
 
-if not OMDB_API_KEY:
-    print("WARNING: OMDB_API_KEY is missing! IMDb ratings may fail.")
-
 def slugify(text):
     return re.sub(r'\W+', '-', text.lower()).strip('-')
 
-# --- UPDATED: Safe & Official IMDb Rating Fetch ---
+# --- IMDb Rating Fetch ---
 def get_imdb_rating(imdb_id):
     if not imdb_id: return "--"
     if not OMDB_API_KEY: return "--"
-    
     try:
-        # Querying the official OMDb API directly
         url = f"https://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={imdb_id}"
         res = requests.get(url, timeout=10).json()
-        
         if res.get('Response') == 'True':
             rating = res.get('imdbRating', '--')
             return str(rating) if rating != 'N/A' else "--"
-        else:
-            print(f"OMDb Error: {res.get('Error')}")
     except Exception as e:
         print(f"OMDb Request failed: {e}")
-        
     return "--"
 
 # --- Letterboxd Scraper ---
@@ -49,7 +40,6 @@ def get_letterboxd_rating(imdb_id):
         url = f"https://letterboxd.com/imdb/{imdb_id}/"
         res = requests.get(url, headers=headers, timeout=10)
         soup = BeautifulSoup(res.text, 'html.parser')
-        
         meta_tag = soup.find('meta', attrs={'name': 'twitter:data2'})
         if meta_tag:
             match = re.search(r'([0-9.]+)\sout\sof', meta_tag['content'])
@@ -57,7 +47,6 @@ def get_letterboxd_rating(imdb_id):
                 return str(match.group(1))
     except Exception as e:
         print(f"LB Scraper failed: {e}")
-        
     return "--"
 
 def fetch_details(query):
@@ -76,11 +65,9 @@ def fetch_details(query):
     country = m['production_countries'][0]['iso_3166_1'] if m.get('production_countries') else "Other"
     regions = {"CN": "Mainland China", "HK": "Hong Kong", "TW": "Taiwan", "FR": "France", "US": "USA", "JP": "Japan", "KR": "South Korea", "GB": "United Kingdom"}
     
-    # Grab TMDB's IMDb ID reference
     imdb_id = m.get('imdb_id')
     print(f"Found IMDb ID: {imdb_id}. Fetching secondary ratings...")
 
-    # Fetch the extra ratings
     imdb_score = get_imdb_rating(imdb_id)
     lb_score = get_letterboxd_rating(imdb_id)
     
@@ -101,7 +88,7 @@ def fetch_details(query):
 movie = fetch_details(ISSUE_TITLE)
 
 if movie:
-    print(f"Success! TMDB: {movie['rating']}, IMDb: {movie['imdb_rating']}, LB: {movie['lb_score'] if 'lb_score' in movie else movie.get('lb_rating', '--')}")
+    print(f"Success! TMDB: {movie['rating']}, IMDb: {movie['imdb_rating']}, LB: {movie['lb_rating']}")
     file_path = 'data/movies.json'
         
     with open(file_path, 'r+') as f:
@@ -110,13 +97,20 @@ if movie:
         except:
             db = []
             
-        if any(m['title'] == movie['title'] for m in db):
-            print(f"Notice: '{movie['title']}' is already in the list. Skipping.")
+        # Check if the movie already exists in the list
+        existing_index = next((i for i, m in enumerate(db) if m['title'] == movie['title']), None)
+        
+        if existing_index is not None:
+            # Overwrite old movie details with updated data
+            print(f"Notice: '{movie['title']}' already exists. Overwriting with fresh ratings & data!")
+            db[existing_index] = movie
         else:
+            # Add as a brand new movie
             db.append(movie)
-            f.seek(0)
-            json.dump(db, f, indent=2)
-            f.truncate()
-            print("Successfully saved new movie with all official ratings to data/movies.json!")
+            print(f"Successfully added new movie: '{movie['title']}'!")
+            
+        f.seek(0)
+        json.dump(db, f, indent=2)
+        f.truncate()
 else:
     print("Script finished without finding a movie.")
