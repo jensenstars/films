@@ -9,7 +9,7 @@ API_KEY = os.getenv('TMDB_API_KEY')
 OMDB_API_KEY = os.getenv('OMDB_API_KEY')
 ISSUE_TITLE = os.getenv('ISSUE_TITLE')
 
-print(f"Bot started. Searching for: '{ISSUE_TITLE}'")
+print(f"Bot started. Parsing input: '{ISSUE_TITLE}'")
 
 if not API_KEY:
     print("ERROR: TMDB_API_KEY is missing!")
@@ -20,8 +20,7 @@ def slugify(text):
 
 # --- IMDb Rating Fetch ---
 def get_imdb_rating(imdb_id):
-    if not imdb_id: return "--"
-    if not OMDB_API_KEY: return "--"
+    if not imdb_id or not OMDB_API_KEY: return "--"
     try:
         url = f"https://www.omdbapi.com/?apikey={OMDB_API_KEY}&i={imdb_id}"
         res = requests.get(url, timeout=10).json()
@@ -34,7 +33,7 @@ def get_imdb_rating(imdb_id):
 
 # --- Letterboxd Scraper ---
 def get_letterboxd_rating(imdb_id):
-    if not imdb_id: return "--"
+    if not imdb_id or not imdb_id.startswith('tt'): return "--"
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
     try:
         url = f"https://letterboxd.com/imdb/{imdb_id}/"
@@ -49,6 +48,7 @@ def get_letterboxd_rating(imdb_id):
         print(f"LB Scraper failed: {e}")
     return "--"
 
+# --- Fetch details helper ---
 def fetch_details(query):
     print("Calling TMDB API...")
     search_url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={query}"
@@ -85,32 +85,75 @@ def fetch_details(query):
         "watch_link": f"https://watchseries.bar/search/{slugify(m['title'])}"
     }
 
-movie = fetch_details(ISSUE_TITLE)
+# --- MAIN LOGIC FLOW ---
+file_path = 'data/movies.json'
 
-if movie:
-    print(f"Success! TMDB: {movie['rating']}, IMDb: {movie['imdb_rating']}, LB: {movie['lb_rating']}")
-    file_path = 'data/movies.json'
+# Detect if this is a REMOVE or DELETE command
+target_title = ISSUE_TITLE.strip()
+is_removal = False
+
+removal_match = re.match(r'^(remove|delete):\s*(.*)$', target_title, re.IGNORECASE)
+if removal_match:
+    is_removal = True
+    target_title = removal_match.group(2).strip()
+    print(f"REMOVAL COMMAND DETECTED for movie: '{target_title}'")
+
+if is_removal:
+    # 1. Fetch official TMDB title for deletion to handle typos/variations
+    print("Fetching official TMDB title for accurate deletion...")
+    search_url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={target_title}"
+    search = requests.get(search_url).json()
+    
+    if search.get('results'):
+        official_title = search['results'][0]['title']
+    else:
+        official_title = target_title # Fallback to user text if TMDB offline
         
+    print(f"Target title to remove: '{official_title}'")
+
+    # 2. Modify JSON database
     with open(file_path, 'r+') as f:
         try:
             db = json.load(f)
         except:
             db = []
             
-        # Check if the movie already exists in the list
-        existing_index = next((i for i, m in enumerate(db) if m['title'] == movie['title']), None)
+        original_count = len(db)
+        # Filter out the movie (case-insensitive match)
+        db = [m for m in db if m['title'].lower() != official_title.lower()]
+        new_count = len(db)
         
-        if existing_index is not None:
-            # Overwrite old movie details with updated data
-            print(f"Notice: '{movie['title']}' already exists. Overwriting with fresh ratings & data!")
-            db[existing_index] = movie
+        if new_count < original_count:
+            f.seek(0)
+            json.dump(db, f, indent=2)
+            f.truncate()
+            print(f"SUCCESS: Removed '{official_title}' from the database.")
         else:
-            # Add as a brand new movie
-            db.append(movie)
-            print(f"Successfully added new movie: '{movie['title']}'!")
-            
-        f.seek(0)
-        json.dump(db, f, indent=2)
-        f.truncate()
+            print(f"NOTICE: '{official_title}' was not found in your list. No changes made.")
+
 else:
-    print("Script finished without finding a movie.")
+    # Standard ADD/UPDATE Logic
+    movie = fetch_details(target_title)
+    if movie:
+        print(f"Success! TMDB: {movie['rating']}, IMDb: {movie['imdb_rating']}, LB: {movie['lb_rating']}")
+        
+        with open(file_path, 'r+') as f:
+            try:
+                db = json.load(f)
+            except:
+                db = []
+                
+            existing_index = next((i for i, m in enumerate(db) if m['title'] == movie['title']), None)
+            
+            if existing_index is not None:
+                print(f"Notice: '{movie['title']}' already exists. Overwriting with fresh ratings & data!")
+                db[existing_index] = movie
+            else:
+                db.append(movie)
+                print(f"Successfully added new movie: '{movie['title']}'!")
+                
+            f.seek(0)
+            json.dump(db, f, indent=2)
+            f.truncate()
+    else:
+        print("Script finished without finding a movie.")
