@@ -88,7 +88,8 @@
     </main>
 
     <footer>
-        <p>A cinematic guide created for family movie nights.</p>
+        <!-- UPDATED FOOTER TEXT -->
+        <p style="font-size: 1.1rem; font-weight: 500; color: #ffffff; margin-bottom: 1.5rem;">Movie night tonight? What do you want to watch?</p>
         
         <p style="font-size: 0.85rem; color: #666; margin-top: 1rem; line-height: 1.8;">
             * Ratings are dynamically sourced: <br>
@@ -157,20 +158,4 @@
 
             const otherRegions = Object.keys(groups).filter(r => !chineseRegions.includes(r));
 
-            // 3. Render non-Chinese regions separated by the updated header
-            if (otherRegions.length > 0) {
-                const separator = document.createElement('div');
-                separator.className = 'group-separator';
-                // UPDATED COPY WITH PERIOD AND EMOJI
-                separator.innerHTML = `<h3 class="separator-text">These films below are not Chinese but Jensen also loves them. 😁</h3>`;
-                main.appendChild(separator);
-
-                otherRegions.forEach(region => {
-                    renderRegion(region, groups[region], main);
-                });
-            }
-        }
-        loadMovies();
-    </script>
-</body>
-</html>
+            // 3. Render non-Chinese regions separated
