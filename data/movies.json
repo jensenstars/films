@@ -1,1 +1,35 @@
-[]
+[
+  {
+    "title": "Farewell My Concubine",
+    "original_title": "霸王别姬",
+    "year": "1993",
+    "director": "Chen Kaige",
+    "region": "Mainland China",
+    "rating": 8.1,
+    "poster": "https://image.tmdb.org/t/p/w500/f54hNIiHNINw3JiUJB2XaQl5wCN.jpg",
+    "desc": "A sprawling, visually magnificent epic spanning fifty years of Chinese history, told through the intertwined lives of two Peking opera actors.",
+    "watch_link": "https://watchseries.bar/search/farewell-my-concubine"
+  },
+  {
+    "title": "In the Mood for Love",
+    "original_title": "花样年华",
+    "year": "2000",
+    "director": "Wong Kar-wai",
+    "region": "Hong Kong",
+    "rating": 8.1,
+    "poster": "https://image.tmdb.org/t/p/w500/1iXbLBfAbq9rwAIRTUKn3kT4vBM.jpg",
+    "desc": "Two neighbors form a strong bond after suspecting their respective spouses of extramarital activities.",
+    "watch_link": "https://watchseries.bar/search/in-the-mood-for-love"
+  },
+  {
+    "title": "Eat Drink Man Woman",
+    "original_title": "饮食男女",
+    "year": "1994",
+    "director": "Ang Lee",
+    "region": "Taiwan",
+    "rating": 7.8,
+    "poster": "https://image.tmdb.org/t/p/w500/j55sl9hODGyht190ghbTDcjoA9a.jpg",
+    "desc": "A semi-retired master chef in Taipei communicates with his three adult daughters primarily through elaborate Sunday dinners.",
+    "watch_link": "https://watchseries.bar/search/eat-drink-man-woman"
+  }
+]
