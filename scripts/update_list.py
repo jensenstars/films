@@ -48,30 +48,55 @@ def get_letterboxd_rating(imdb_id):
         print(f"LB Scraper failed: {e}")
     return "--"
 
-# --- Unified Fetch Details (Movies + TV) ---
+# --- Unified Fetch Details (with Smart Year Filtering) ---
 def fetch_details(query):
-    print("Calling TMDB Multi-Search API...")
-    search_url = f"https://api.themoviedb.org/3/search/multi?api_key={API_KEY}&query={query}"
+    # 1. Detect if a 4-digit year is in the query (e.g., "1995" or "(1995)")
+    year_match = re.search(r'\b(19\d\d|20\d\d)\b', query)
+    target_year = year_match.group(1) if year_match else None
+    
+    clean_query = query
+    if target_year:
+        print(f"Target year constraint parsed: '{target_year}'")
+        # Strip the year out of the search query so TMDB doesn't get confused
+        clean_query = re.sub(r'\(?\b' + target_year + r'\b\)?', '', query)
+        clean_query = re.sub(r'\s+', ' ', clean_query).strip()
+
+    print(f"Calling TMDB Multi-Search API for: '{clean_query}'...")
+    search_url = f"https://api.themoviedb.org/3/search/multi?api_key={API_KEY}&query={clean_query}"
     search = requests.get(search_url).json()
     
     if not search.get('results'): 
-        print(f"ERROR: No result found for '{query}'.")
+        print(f"ERROR: No result found for '{clean_query}'.")
         return None
         
-    # Filter out people/actors and only look for movies or TV shows
     valid_results = [r for r in search['results'] if r.get('media_type') in ['movie', 'tv']]
     if not valid_results:
         print("ERROR: No valid movie or TV series found.")
         return None
         
-    first_result = valid_results[0]
-    media_type = first_result['media_type']
-    m_id = first_result['id']
+    # 2. Smart Year Matching
+    final_result = None
+    if target_year:
+        for r in valid_results:
+            # Check movie release date or TV first air date
+            date_str = r.get('release_date') or r.get('first_air_date')
+            if date_str and date_str.startswith(target_year):
+                final_result = r
+                print(f"MATCH FOUND: Found release matching year {target_year}!")
+                break
+                
+    # Fallback to the first result if no year constraint was set, or if the year search failed
+    if not final_result:
+        if target_year:
+            print(f"Notice: No exact match found for year '{target_year}'. Falling back to most popular search result.")
+        final_result = valid_results[0]
+        
+    media_type = final_result['media_type']
+    m_id = final_result['id']
     
-    print(f"Found {media_type.upper()} with ID: {m_id}. Fetching details...")
+    print(f"Selected {media_type.upper()} with ID: {m_id}. Fetching details...")
     
     if media_type == 'movie':
-        # Movie Specific Logic
         m = requests.get(f"https://api.themoviedb.org/3/movie/{m_id}?api_key={API_KEY}&append_to_response=credits").json()
         title = m['title']
         original_title = m.get('original_title', title)
@@ -81,30 +106,24 @@ def fetch_details(query):
         country = m['production_countries'][0]['iso_3166_1'] if m.get('production_countries') else "Other"
         country_name = m['production_countries'][0]['name'] if m.get('production_countries') else "Other"
     else:
-        # TV Specific Logic
         m = requests.get(f"https://api.themoviedb.org/3/tv/{m_id}?api_key={API_KEY}").json()
         title = m['name']
         original_title = m.get('original_name', title)
         year = m.get('first_air_date', 'Unknown')[:4]
         
-        # Use Show Creator as the "Director" field
         creators = m.get('created_by', [])
         director = f"{creators[0]['name']} (Show Creator)" if creators else "Unknown (TV Series)"
         
-        # TV IMDb IDs require an extra external ID call in TMDB
         ext_ids = requests.get(f"https://api.themoviedb.org/3/tv/{m_id}/external_ids?api_key={API_KEY}").json()
         imdb_id = ext_ids.get('imdb_id')
         
-        # Parse TV Country
         if m.get('origin_country'):
             country = m['origin_country'][0]
-            # Common TV country mapper
             country_mapper = {"CN": "Mainland China", "HK": "Hong Kong", "TW": "Taiwan", "KR": "South Korea", "JP": "Japan", "US": "United States of America"}
             country_name = country_mapper.get(country, country)
         else:
             country, country_name = "Other", "Other"
 
-    # Custom region overrides (e.g. United States -> USA)
     overrides = {
         "CN": "Mainland China",
         "US": "USA",
@@ -112,9 +131,7 @@ def fetch_details(query):
         "GB": "United Kingdom"
     }
     region = overrides.get(country, overrides.get(country_name, country_name))
-    print(f"Region parsed: code={country}, raw_name={country_name} -> display_as={region}")
-
-    # Fetch secondary ratings
+    
     imdb_score = get_imdb_rating(imdb_id)
     lb_score = get_letterboxd_rating(imdb_id)
     
@@ -145,6 +162,7 @@ if removal_match:
     print(f"REMOVAL COMMAND DETECTED for movie: '{target_title}'")
 
 if is_removal:
+    # Match using search query to find the official title
     print("Fetching official TMDB title for accurate deletion...")
     search_url = f"https://api.themoviedb.org/3/search/multi?api_key={API_KEY}&query={target_title}"
     search = requests.get(search_url).json()
