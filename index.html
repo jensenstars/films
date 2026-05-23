@@ -46,7 +46,18 @@
         .tmdb-score { color: var(--tmdb-blue); }
 
         .movie-desc { font-size: 0.95rem; color: var(--text-muted); flex-grow: 1; margin-bottom: 1.5rem; }
-        .cn-title { color: #fff; font-weight: bold; }
+        .cn-title { color: #fff; font-weight: normal; } /* Changed to normal font weight */
+        
+        /* New Trailer Text Button Style */
+        .trailer-btn {
+            display: inline-block;
+            margin-top: 0.5rem;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .trailer-btn:hover { color: #fff; text-decoration: underline; }
 
         .watch-btn {
             display: block; text-align: center; padding: 0.8rem; border: 1px solid var(--accent-color);
@@ -84,8 +95,7 @@
     </header>
 
     <main id="content-library">
-        <!-- Content will be auto-generated here -->
-    </main>
+        </main>
 
     <footer>
         <p>Movie night tonight? What do you want to watch?</p>
@@ -126,7 +136,10 @@
                             </div>
                         </div>
                         
-                        <p class="movie-desc"><span class="cn-title">${m.original_title}:</span> ${m.desc}</p>
+                        <p class="movie-desc">
+                            <span class="cn-title">Original Title: ${m.original_title}</span><br>
+                            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(m.title + ' official trailer')}" target="_blank" class="trailer-btn">Trailer →</a>
+                        </p>
                         <a href="${m.watch_link}" target="_blank" class="watch-btn">Watch Now</a>
                     </div>
                 `;
