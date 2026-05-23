@@ -24,7 +24,6 @@
         section { margin-bottom: 4rem; }
         h2 { font-size: 2rem; border-bottom: 2px solid var(--accent-color); padding-bottom: 0.5rem; margin-bottom: 2rem; display: inline-block; }
 
-        /* Grid: Modern Dynamic Columns */
         .movie-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr)); 
@@ -40,24 +39,19 @@
         .movie-title { font-size: 1.3rem; font-weight: bold; margin: 0; color: #ffffff; line-height: 1.3; }
         .movie-meta { font-size: 0.9rem; color: var(--accent-color); margin-bottom: 0.5rem; }
 
-        /* Ratings Row */
         .ratings-row { display: flex; gap: 12px; margin-bottom: 1rem; align-items: center; }
         .rating-pill { font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 4px; }
         .tmdb-score { color: var(--tmdb-blue); }
 
+        /* Minimalist Description Container */
         .movie-desc { font-size: 0.95rem; color: var(--text-muted); flex-grow: 1; margin-bottom: 1.5rem; }
-        .cn-title { color: #fff; font-weight: normal; } /* Changed to normal font weight */
         
-        /* New Trailer Text Button Style */
-        .trailer-btn {
-            display: inline-block;
-            margin-top: 0.5rem;
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .trailer-btn:hover { color: #fff; text-decoration: underline; }
+        /* Original Title set to regular font weight */
+        .cn-title { color: #fff; font-weight: normal; }
+        
+        /* Trailer link styling */
+        .trailer-link { color: var(--accent-color); text-decoration: none; transition: 0.2s; font-weight: 500; }
+        .trailer-link:hover { text-decoration: underline; color: #fff; }
 
         .watch-btn {
             display: block; text-align: center; padding: 0.8rem; border: 1px solid var(--accent-color);
@@ -66,23 +60,8 @@
         }
         .watch-btn:hover { background-color: var(--accent-color); color: var(--bg-color); }
 
-        /* Separator / Divider Styles */
-        .group-separator {
-            text-align: center;
-            margin: 6rem 0 4rem;
-            border-top: 1px dashed #33333a;
-            padding-top: 4rem;
-        }
-        .separator-text {
-            font-size: 1.6rem;
-            color: var(--accent-color);
-            letter-spacing: 1px;
-            margin: 0;
-            display: inline-block;
-            font-weight: normal;
-            font-family: Georgia, serif;
-            font-style: italic;
-        }
+        .group-separator { text-align: center; margin: 6rem 0 4rem; border-top: 1px dashed #33333a; padding-top: 4rem; }
+        .separator-text { font-size: 1.6rem; color: var(--accent-color); letter-spacing: 1px; margin: 0; display: inline-block; font-weight: normal; font-family: Georgia, serif; font-style: italic; }
 
         footer { text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid #2a2a30; }
     </style>
@@ -95,10 +74,11 @@
     </header>
 
     <main id="content-library">
-        </main>
+        <!-- Content will be auto-generated here -->
+    </main>
 
     <footer>
-        <p>Movie night tonight? What do you want to watch?</p>
+        <p>A cinematic guide created for family movie nights.</p>
         
         <p style="font-size: 0.85rem; color: #666; margin-top: 1rem; line-height: 1.8;">
             * Ratings are dynamically sourced: <br>
@@ -136,10 +116,12 @@
                             </div>
                         </div>
                         
+                        <!-- Restructured Description container -->
                         <p class="movie-desc">
-                            <span class="cn-title">Original Title: ${m.original_title}</span><br>
-                            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(m.title + ' official trailer')}" target="_blank" class="trailer-btn">Trailer →</a>
+                            <span class="cn-title">${m.original_title}</span>
+                            ${m.trailer_link ? ` &nbsp;•&nbsp; <a href="${m.trailer_link}" target="_blank" class="trailer-link">Official Trailer →</a>` : ''}
                         </p>
+                        
                         <a href="${m.watch_link}" target="_blank" class="watch-btn">Watch Now</a>
                     </div>
                 `;
@@ -158,10 +140,8 @@
             }, {});
 
             const main = document.getElementById('content-library');
-            
             const chineseRegions = ["Mainland China", "Hong Kong", "Taiwan"];
 
-            // 1. Render Chinese regions first
             chineseRegions.forEach(region => {
                 if (groups[region]) {
                     renderRegion(region, groups[region], main);
@@ -170,12 +150,11 @@
 
             const otherRegions = Object.keys(groups).filter(r => !chineseRegions.includes(r));
 
-            // 3. Render non-Chinese regions separated by the updated header
             if (otherRegions.length > 0) {
                 const separator = document.createElement('div');
                 separator.className = 'group-separator';
-                // UPDATED COPY WITH PERIOD AND EMOJI
-                separator.innerHTML = `<h3 class="separator-text">These films below are not Chinese but Jensen also loves them. 😁</h3>`;
+                // UPDATED COPY: "The films & shows below..."
+                separator.innerHTML = `<h3 class="separator-text">The films & shows below are not Chinese but Jensen also loves them. 😁</h3>`;
                 main.appendChild(separator);
 
                 otherRegions.forEach(region => {
