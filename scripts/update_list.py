@@ -3,6 +3,7 @@ import requests
 import json
 import re
 import sys
+import urllib.parse
 from bs4 import BeautifulSoup
 
 API_KEY = os.getenv('TMDB_API_KEY')
@@ -48,16 +49,19 @@ def get_letterboxd_rating(imdb_id):
         print(f"LB Scraper failed: {e}")
     return "--"
 
-# --- Unified Fetch Details (with Smart Year Filtering) ---
+# --- NEW: Stable YouTube Search Link Generator ---
+def make_youtube_search_url(title):
+    query = f"{title} official trailer"
+    return f"https://www.youtube.com/results?search_query={urllib.parse.quote_plus(query)}"
+
+# --- Unified Fetch Details ---
 def fetch_details(query):
-    # 1. Detect if a 4-digit year is in the query (e.g., "1995" or "(1995)")
     year_match = re.search(r'\b(19\d\d|20\d\d)\b', query)
     target_year = year_match.group(1) if year_match else None
     
     clean_query = query
     if target_year:
         print(f"Target year constraint parsed: '{target_year}'")
-        # Strip the year out of the search query so TMDB doesn't get confused
         clean_query = re.sub(r'\(?\b' + target_year + r'\b\)?', '', query)
         clean_query = re.sub(r'\s+', ' ', clean_query).strip()
 
@@ -74,21 +78,16 @@ def fetch_details(query):
         print("ERROR: No valid movie or TV series found.")
         return None
         
-    # 2. Smart Year Matching
     final_result = None
     if target_year:
         for r in valid_results:
-            # Check movie release date or TV first air date
             date_str = r.get('release_date') or r.get('first_air_date')
             if date_str and date_str.startswith(target_year):
                 final_result = r
                 print(f"MATCH FOUND: Found release matching year {target_year}!")
                 break
                 
-    # Fallback to the first result if no year constraint was set, or if the year search failed
     if not final_result:
-        if target_year:
-            print(f"Notice: No exact match found for year '{target_year}'. Falling back to most popular search result.")
         final_result = valid_results[0]
         
     media_type = final_result['media_type']
@@ -131,9 +130,12 @@ def fetch_details(query):
         "GB": "United Kingdom"
     }
     region = overrides.get(country, overrides.get(country_name, country_name))
-    
+
     imdb_score = get_imdb_rating(imdb_id)
     lb_score = get_letterboxd_rating(imdb_id)
+    
+    # Generate the custom search URL for the trailer
+    trailer_url = make_youtube_search_url(title)
     
     return {
         "title": title,
@@ -145,13 +147,12 @@ def fetch_details(query):
         "imdb_rating": imdb_score,
         "lb_rating": lb_score,
         "poster": f"https://image.tmdb.org/t/p/w500{m['poster_path']}" if m.get('poster_path') else "",
-        "desc": m.get('overview', 'No description available.'),
-        "watch_link": f"https://watchseries.bar/search/{slugify(title)}"
+        "watch_link": f"https://watchseries.bar/search/{slugify(title)}",
+        "trailer_link": trailer_url # New precise search URL format
     }
 
 # --- MAIN LOGIC FLOW ---
 file_path = 'data/movies.json'
-
 target_title = ISSUE_TITLE.strip()
 is_removal = False
 
@@ -162,7 +163,6 @@ if removal_match:
     print(f"REMOVAL COMMAND DETECTED for movie: '{target_title}'")
 
 if is_removal:
-    # Match using search query to find the official title
     print("Fetching official TMDB title for accurate deletion...")
     search_url = f"https://api.themoviedb.org/3/search/multi?api_key={API_KEY}&query={target_title}"
     search = requests.get(search_url).json()
@@ -197,7 +197,7 @@ if is_removal:
 else:
     movie = fetch_details(target_title)
     if movie:
-        print(f"Success! TMDB: {movie['rating']}, IMDb: {movie['imdb_rating']}, LB: {movie['lb_rating']}")
+        print(f"Success! TMDB: {movie['rating']}, IMDb: {movie['imdb_rating']}, LB: {movie['lb_rating']}, Trailer: {movie['trailer_link']}")
         
         with open(file_path, 'r+') as f:
             try:
@@ -208,11 +208,11 @@ else:
             existing_index = next((i for i, m in enumerate(db) if m['title'] == movie['title']), None)
             
             if existing_index is not None:
-                print(f"Notice: '{movie['title']}' already exists. Overwriting with fresh ratings & data!")
+                print(f"Notice: '{movie['title']}' already exists. Overwriting with updated data!")
                 db[existing_index] = movie
             else:
                 db.append(movie)
-                print(f"Successfully added new movie/show: '{movie['title']}'!")
+                print(f"Successfully added: '{movie['title']}'!")
                 
             f.seek(0)
             json.dump(db, f, indent=2)
