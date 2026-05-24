@@ -22,8 +22,55 @@
         
         main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
         section { margin-bottom: 4rem; }
-        h2 { font-size: 2rem; border-bottom: 2px solid var(--accent-color); padding-bottom: 0.5rem; margin-bottom: 2rem; display: inline-block; }
 
+        /* --- NEW: Interactive Summary / Foldable Header Styles --- */
+        summary {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            outline: none;
+            user-select: none;
+            list-style: none; /* Hide default browser arrows in Chrome/Firefox */
+            transition: color 0.2s ease;
+        }
+        
+        summary::-webkit-details-marker {
+            display: none; /* Hide default browser arrows in Safari */
+        }
+
+        summary:hover {
+            color: var(--accent-color);
+        }
+
+        /* Sleek Rotating Caret Icon */
+        summary::after {
+            content: '▾';
+            margin-left: 12px;
+            font-size: 1.6rem;
+            color: var(--accent-color);
+            transition: transform 0.25s ease;
+            line-height: 1;
+        }
+
+        /* Rotate arrow when open */
+        details[open] summary::after {
+            transform: rotate(-180deg);
+        }
+
+        /* Smart Spacing: Remove bottom margin when folded so headers stack tightly */
+        details[open] summary {
+            margin-bottom: 2rem;
+        }
+        details:not([open]) summary {
+            margin-bottom: 0;
+        }
+
+        /* Grid: Modern Dynamic Columns */
         .movie-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(min(330px, 100%), 1fr)); 
@@ -78,7 +125,7 @@
     </main>
 
     <footer>
-        <p>Jensen’s cinematic guide for movie nights with friends & family.</p>
+        <p>Jensen’s cinematic guide for movie nights with friend’s & family.</p>
         
         <p style="font-size: 0.85rem; color: #666; margin-top: 1rem; line-height: 1.8;">
             * Ratings are dynamically sourced: <br>
@@ -93,10 +140,21 @@
     <script>
         function renderRegion(regionName, moviesList, container) {
             const section = document.createElement('section');
-            section.innerHTML = `<h2>${regionName}</h2><div class="movie-grid"></div>`;
+            
+            // Render region wrapped inside collapsible details element
+            section.innerHTML = `
+                <details open class="region-details">
+                    <summary class="region-summary">${regionName}</summary>
+                    <div class="movie-grid"></div>
+                </details>
+            `;
             const grid = section.querySelector('.movie-grid');
 
             moviesList.forEach(m => {
+                // Fallback direct link is removed. Now always generates a clean YouTube search query URL
+                const cleanQuery = encodeURIComponent(`${m.title} ${m.year} official trailer`);
+                const trailerUrl = m.trailer_link ? m.trailer_link : `https://www.youtube.com/results?search_query=${cleanQuery}`;
+
                 grid.innerHTML += `
                     <div class="movie-card">
                         <div class="movie-poster"><img src="${m.poster}" alt="${m.title}"></div>
@@ -116,10 +174,9 @@
                             </div>
                         </div>
                         
-                        <!-- Restructured Description container -->
                         <p class="movie-desc">
                             <span class="cn-title">${m.original_title}</span>
-                            ${m.trailer_link ? ` &nbsp;•&nbsp; <a href="${m.trailer_link}" target="_blank" class="trailer-link">Official Trailer →</a>` : ''}
+                            &nbsp;•&nbsp; <a href="${trailerUrl}" target="_blank" class="trailer-link">Official Trailer →</a>
                         </p>
                         
                         <a href="${m.watch_link}" target="_blank" class="watch-btn">Watch Now</a>
@@ -153,7 +210,6 @@
             if (otherRegions.length > 0) {
                 const separator = document.createElement('div');
                 separator.className = 'group-separator';
-                // UPDATED COPY: "The films & shows below..."
                 separator.innerHTML = `<h3 class="separator-text">The films & shows below are not Chinese but Jensen also loves them. 😁</h3>`;
                 main.appendChild(separator);
 
