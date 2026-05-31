@@ -466,5 +466,18 @@
     "poster": "https://image.tmdb.org/t/p/w500/quEsOLHDRfceciUaHbjU3k25OJN.jpg",
     "watch_link": "https://watchseries.bar/search/man-in-an-orange-shirt",
     "trailer_link": "https://www.youtube.com/results?search_query=Man+in+an+Orange+Shirt+official+trailer"
+  },
+  {
+    "title": "Catch Me If You Can",
+    "original_title": "Catch Me If You Can",
+    "year": "2002",
+    "director": "Steven Spielberg",
+    "region": "USA",
+    "rating": 8.0,
+    "imdb_rating": "8.1",
+    "lb_rating": "4.05",
+    "poster": "https://image.tmdb.org/t/p/w500/ctjEj2xM32OvBXCq8zAdK3ZrsAj.jpg",
+    "watch_link": "https://watchseries.bar/search/catch-me-if-you-can",
+    "trailer_link": "https://www.youtube.com/results?search_query=Catch+Me+If+You+Can+official+trailer"
   }
 ]
