@@ -466,5 +466,18 @@
     "poster": "https://image.tmdb.org/t/p/w500/ctjEj2xM32OvBXCq8zAdK3ZrsAj.jpg",
     "watch_link": "https://watchseries.bar/search/catch-me-if-you-can",
     "trailer_link": "https://www.youtube.com/results?search_query=Catch+Me+If+You+Can+official+trailer"
+  },
+  {
+    "title": "Disclosure Day",
+    "original_title": "Disclosure Day",
+    "year": "2026",
+    "director": "Steven Spielberg",
+    "region": "USA",
+    "rating": 7.9,
+    "imdb_rating": "--",
+    "lb_rating": "--",
+    "poster": "https://image.tmdb.org/t/p/w500/bGgrr83LC6bVRg9F5UE52i4gpE3.jpg",
+    "watch_link": "https://watchseries.bar/search/disclosure-day",
+    "trailer_link": "https://www.youtube.com/results?search_query=Disclosure+Day+official+trailer"
   }
 ]
