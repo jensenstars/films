@@ -479,5 +479,18 @@
     "poster": "https://image.tmdb.org/t/p/w500/bGgrr83LC6bVRg9F5UE52i4gpE3.jpg",
     "watch_link": "https://watchseries.bar/search/disclosure-day",
     "trailer_link": "https://www.youtube.com/results?search_query=Disclosure+Day+official+trailer"
+  },
+  {
+    "title": "The Tigers of Mompracem",
+    "original_title": "Le tigri di Mompracem",
+    "year": "1970",
+    "director": "Mario Sequi",
+    "region": "Italy",
+    "rating": 5.9,
+    "imdb_rating": "5.8",
+    "lb_rating": "--",
+    "poster": "https://image.tmdb.org/t/p/w500/c0d3U7KsjIPVkkuAQiWMiw3AKXi.jpg",
+    "watch_link": "https://watchseries.bar/search/the-tigers-of-mompracem",
+    "trailer_link": "https://www.youtube.com/results?search_query=The+Tigers+of+Mompracem+official+trailer"
   }
 ]
